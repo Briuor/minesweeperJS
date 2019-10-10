@@ -7,41 +7,52 @@ export default class Game {
 
 	constructor() {
 		
-		this.sprite = new Sprite(); // load sprite
+		// game sprite
+		this.sprite = new Sprite(); 
 
-		this.level = new Level('hard', 30, 16, 99); // default level is easy
+		// level handler
+		this.level = new Level('easy', 9, 9, 10); // default level is easy
 		this.level.initChangeLevelEvent(this);
 
-		this.playerStatus = "playing"; // loser , winner, restart, playing
+		this.playerStatus = "playing"; // values: 'loser' , 'winner', 'restart', 'playing'
 		
 		this.seg = 0; 		 // game seconds counter
 		this.digUnitSeg = 0; // seconds unit to be showed
 		this.digDezSeg = 0;  // seconds dezen to be showed
 		this.digCenSeg = 0;  // seconds centen to be showed
 
-		this.initCanvas(); // init canvas dimensions based on level
-		
-		this.board = new Board(this.level.getNumBlocksRow, this.level.getNumBlocksColumn, this.level.getNumMines);
-
-		this.firstClick = false; // first click flag to start and stop game counter
-		this.initInputHandler(); // handle left/right clicks and double clicks
-
+		this.initCanvas(); // init canvas dimensions
 		// canvas event to prevent the menu appear by right click
 		this.canvas.addEventListener('contextmenu', event => event.preventDefault());
+		
+		// game board
+		this.board = new Board(this.level.getNumBlocksRow, this.level.getNumBlocksColumn, this.level.getNumMines);
 
+		// first click flag to start and stop game counter
+		this.firstClick = false;
+		 
+		// handle left/right clicks and double clicks
+		this.initInputHandler(); 
+		
+		// gameRestart and timeCounter functions must be binded with the class context to avoid context errors
+		this.gameRestart = this.gameRestart.bind(this);
 		this.timeCounter = this.timeCounter.bind(this);
+
+		// each time user click on the face pop the last and push a new interval to count the time
+		// a array to handle intervals is useful to avoid multiple intervals running at same time
 		this.refTimeCounterInterval = [];
 		this.refTimeCounterInterval.push(setInterval(this.timeCounter,  10));
 
+	
 	}
 
+	// init canvas dimensions based on level
 	initCanvas() { 
 		this.canvas = document.getElementById("canvas");
 		this.canvas.width = this.level.getNumBlocksRow * Block.SIZE + (2 * Sprite.SIDE_LR_WIDTH);
 		this.canvas.height = this.level.getNumBlocksColumn * Block.SIZE + (3 * Sprite.SIDE_TMD_HEIGHT) + Sprite.PANEL_HEIGHT;
 		this.ctx = this.canvas.getContext("2d");	
 	}
-
 
 	draw() {
 		//  clean screen
@@ -71,16 +82,15 @@ export default class Game {
 		// this.ctx.fillRect(0, 67, this.canvas.width, this.canvas.height);
 	}
 
-
+	// load sprite and draw game board on canvas
 	start(gameContext) {
-		// load image and draw on screen
 		this.sprite.getImage.onload = function() {
 			gameContext.draw();
 		}
 	}
 
 
-	timeCounter = () => {
+	timeCounter() {
 
 		if(this.firstClick) {
 			let lastSeg = Date.now();
@@ -161,7 +171,7 @@ export default class Game {
 		});
 	}
 
-	gameRestart = () => {
+	gameRestart() {
 		this.board = new Board(this.level.getNumBlocksRow, this.level.getNumBlocksColumn, this.level.getNumMines);
 		this.firstClick = false;
 		this.digUnitSeg = this.digDezSeg = this.digCenSeg = 0;
