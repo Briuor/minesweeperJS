@@ -1,6 +1,8 @@
 # minesweeperJS
 A minesweeper game made with javascript(es6 syntax) and canvas
 
+![Screenshot](img/screenshot.png)
+
 ## How to run
 ```sh
 # on terminal
@@ -15,5 +17,5 @@ php -S localhost:8080
 localhost:8080
 ```
 ## Warning
+:warning:
 If you open the index.html on a browser without a web server running, you will come across the Cross-Origin Resource Sharing (CORS) error
-
